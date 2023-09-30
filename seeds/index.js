@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const cities = require('./cities');
 const Campground = require('../models/campground')
-const URI = "mongodb://localhost:27017"
+const URI = "mongodb://0.0.0.0:27017/"
 const {places,descriptors} = require('./seedHelpers')
 mongoose.connect(URI);
 
