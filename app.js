@@ -9,8 +9,12 @@ const catchAsync = require('./utils/catchAsync');
 const Review = require('./models/reviews');
 const session = require('express-session');
 const flash = require('connect-flash');
-//const Expresserror = require('./utils/ExpressError')
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user')
 
+//const Expresserror = require('./utils/ExpressError')
+const userRoutes = require('./routes/users');
 const campgrounds = require('./routes/campgrounds');
 const reviews = require('./routes/reviews');
 
@@ -32,8 +36,7 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(meethodOverride("_method"));
-app.use('/campgrounds',campgrounds);
-app.use("/campgrounds/:id/reviews",reviews);
+
 app.use(express.static(path.join(__dirname,'public')));
 // app.use(flash());
 
@@ -50,10 +53,23 @@ const sessionConfig = {
 
 }
 app.use(session(sessionConfig));
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 // app.use((req,res,next)=>{
 //   res.locals.success = req.flash('success');
 //   next();
 // })
+
+
+
+app.use('/campgrounds',campgrounds);
+app.use("/campgrounds/:id/reviews",reviews);
+app.use("/",userRoutes);
 
 app.get("/", (req, res) => {
   res.render("home");
@@ -65,12 +81,12 @@ app.all('*',(req,res)=>{
   res.send('404')
 })
 
-app.use((err, req, res, next) => {
-// const {statusCode=500,message ='Something went wrong'} = err;
+// app.use((err, req, res, next) => {
+// // const {statusCode=500,message ='Something went wrong'} = err;
 
-//   res.status(statusCode).send(message);
-  res.send('MiddleWare');
-})
+// //   res.status(statusCode).send(message);
+//   res.send('MiddleWare');
+// })
 
 app.listen(3000, () => {
   console.log("Serving on prot 3000");

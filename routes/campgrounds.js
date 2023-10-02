@@ -15,7 +15,8 @@ router.get("/", async (req, res) => {
     res.render("campgrounds/new");
   });
   router.post("/", catchAsync(async (req, res, next) => {
-    // res.send(req.body)
+    // res.send(req.body) 
+      
       const campground = new Campground(req.body.campground);
       await campground.save();
       req.flash('success','Added a new campground');
