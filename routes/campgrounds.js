@@ -3,6 +3,7 @@ const router = express.Router();
 const Expresserror = require('../utils/ExpressError');
 const catchAsync = require('../utils/catchAsync');
 const Campground = require("../models/campground");
+const {isLoggedIn} = require('../middleware');
 
 //showig all the cities
 router.get("/", async (req, res) => {
@@ -11,21 +12,22 @@ router.get("/", async (req, res) => {
   });
   
   //creating a new city
-  router.get("/new", (req, res) => {
+  router.get("/new",isLoggedIn, (req, res) => {
+    
     res.render("campgrounds/new");
   });
-  router.post("/", catchAsync(async (req, res, next) => {
+  router.post("/",isLoggedIn, catchAsync(async (req, res, next) => {
     // res.send(req.body) 
       
       const campground = new Campground(req.body.campground);
       await campground.save();
-      req.flash('success','Added a new campground');
+      // req.flash('success','Added a new campground');
       res.redirect(`/campgrounds/${campground._id}`);
   
   }));
   
   //detailed view of city
-  router.get("/:id", async (req, res) => {
+  router.get("/:id",async (req, res) => {
     const campground = await Campground.findById(req.params.id).populate('reviews');
     res.render("campgrounds/show", { campground });
   });

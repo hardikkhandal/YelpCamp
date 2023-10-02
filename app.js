@@ -60,10 +60,13 @@ app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-// app.use((req,res,next)=>{
-//   res.locals.success = req.flash('success');
-//   next();
-// })
+
+
+app.use((req,res,next)=>{
+  res.locals.currentUser = req.user;
+  //res.locals.success = req.flash('success');
+  next();
+})
 
 
 
@@ -77,6 +80,7 @@ app.get("/", (req, res) => {
 
 
 app.all('*',(req,res)=>{
+
   // next(new Expresserror('Page Not Found',404))
   res.send('404')
 })
