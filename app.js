@@ -1,17 +1,29 @@
+// if(process.env.NODE_ENV!=="production"){
+//   require('dotenv').config();
+// }
+
+
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+
+const dbUrl = process.env.DB_URL
+
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
 const URI = "mongodb://0.0.0.0:27017/";
 const Campground = require("./models/campground");
 const meethodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const catchAsync = require('./utils/catchAsync');
 const Review = require('./models/reviews');
-const session = require('express-session');
+
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user')
+
 
 //const Expresserror = require('./utils/ExpressError')
 const userRoutes = require('./routes/users');
@@ -40,9 +52,22 @@ app.use(meethodOverride("_method"));
 app.use(express.static(path.join(__dirname,'public')));
 // app.use(flash());
 
+const secret = 'demodemo'
 
+// const store = MongoStore.create({
+//   mongoUrl: dbUrl,
+//   touchAfter: 24 * 60 * 60,
+//   crypto: {
+//       secret: 'thisshouldbeabettersecret!'
+//   }
+// });
+
+// store.on("error",function (e){
+//   console.log("Session Store Error",e);
+// })
 const sessionConfig = {
-  secret: 'demosecret',
+  
+  secret:secret,
   resave:false,
   saveUnitialized:true,
   cookie:{
@@ -63,6 +88,7 @@ passport.deserializeUser(User.deserializeUser());
 
 
 app.use((req,res,next)=>{
+  
   res.locals.currentUser = req.user;
   //res.locals.success = req.flash('success');
   next();
@@ -75,7 +101,7 @@ app.use("/campgrounds/:id/reviews",reviews);
 app.use("/",userRoutes);
 
 app.get("/", (req, res) => {
-  res.render("home");
+  res.redirect('/campgrounds');
 });
 
 
